@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}AI Daily News Summarizer{% endblock %}
+
+{% block content %}
+  <div class="row g-4 align-items-start">
+    <!-- Left: hero and form -->
+    <div class="col-lg-5">
+      <div class="card glass-card shadow-sm border-0 rounded-4 mb-3">
+        <div class="card-body">
+          <h1 class="h3 mb-2">Get the top 5 stories, summarized.</h1>
+          <p class="text-muted mb-4">
+            Choose a newspaper and category to view AI-generated summaries of the latest headlines.
+          </p>
+          <form method="POST" class="vstack gap-3">
+            <div>
+              <label for="source" class="form-label fw-semibold">Newspaper</label>
+              <select id="source" name="source" class="form-select fancy-select" required>
+                {% for np in newspapers %}
+                  <option value="{{ np }}" {% if selected_source == np %}selected{% endif %}>{{ np }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div>
+              <label for="category" class="form-label fw-semibold">Category</label>
+              <select id="category" name="category" class="form-select fancy-select" required>
+                {% for cat in categories %}
+                  <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <button class="btn btn-primary btn-lg rounded-pill mt-2" type="submit">
+              Fetch &amp; Summarize
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="small text-muted">
+        This tool summarizes news using an AI model from Hugging Face.
+        For complete details, always read the full article on the original site.
+      </div>
+    </div>
+
+    <!-- Right: results -->
+    <div class="col-lg-7">
+      {% if summaries %}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h5 mb-0">
+            Top news from {{ selected_source }} · {{ selected_category }}
+          </h2>
+        </div>
+
+        <div class="news-list">
+          {% for s in summaries %}
+            <article class="news-card rounded-4 p-3 mb-3">
+              <h3 class="h5 mb-1">
+                <a href="{{ s.link }}" target="_blank" rel="noopener noreferrer" class="news-title-link">
+                  {{ s.title }}
+                </a>
+              </h3>
+              <div class="text-muted small mb-2">
+                Source: <strong>{{ s.source }}</strong>
+                {% if s.published %} &middot; <span>{{ s.published }}</span>{% endif %}
+              </div>
+              <p class="mb-2">{{ s.summary }}</p>
+              <a class="btn btn-sm btn-outline-secondary rounded-pill"
+                 href="{{ s.link }}" target="_blank" rel="noopener noreferrer">
+                Read full article on {{ s.source }}
+              </a>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state text-center p-5 rounded-4">
+          <h2 class="h5 mb-2">No summaries yet</h2>
+          <p class="text-muted mb-0">
+            Select a newspaper and category, then click
+            <strong>Fetch &amp; Summarize</strong> to see the top 5 headlines.
+          </p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
